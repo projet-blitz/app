@@ -2,13 +2,8 @@ package com.blitz
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -20,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,10 +26,10 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
@@ -44,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,19 +47,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.gms.common.ConnectionResult
+import com.blitz.api.NetworkSecurity
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.maps.android.compose.GoogleMap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.Request
 
 class MainActivity : ComponentActivity() {
 
@@ -114,7 +108,6 @@ class MainActivity : ComponentActivity() {
         //return resultCode == ConnectionResult.SUCCESS
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     @Preview
     fun ModalNavigationDrawerSample() {
@@ -156,7 +149,6 @@ class MainActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
-                //.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Button(onClick = { scope.launch { drawerState.open() } }) {
@@ -166,6 +158,7 @@ class MainActivity : ComponentActivity() {
 
                 if (isGooglePlayServicesAvailable(LocalContext.current)) {
                     GoogleMapBox()
+                    ApiStmExample()
                     ResizableBox()
                 } else {
                     NormalBox()
@@ -176,13 +169,42 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun GoogleMapBox() {
-        GoogleMap(
-            modifier = Modifier
-                .fillMaxWidth()
-                //.fillMaxHeight()
+
+        Text(
+            text = ""
         )
     }
 
+
+
+    @Composable
+    fun ApiStmExample() {/*
+        var apiResponse by remember { mutableStateOf("") }
+
+        // Use the HttpClient from OkHttp to make a simple GET request
+        val client = NetworkSecurity().createOkHttpClient()
+        val request = Request.Builder()
+            .url("https://10.0.2.2:7224/horaires/69/55222")
+            .build()
+
+        LaunchedEffect(key1 = true) {
+            val response = withContext(Dispatchers.IO) {
+                client.newCall(request).execute()
+            }
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                responseBody?.let {
+                    apiResponse = it
+                }
+            } else {
+                // Handle the error, e.g., show an error message
+            }
+        }
+
+        Text(
+            text = apiResponse
+        )*/
+    }
 
     @Composable
     fun ResizableBox() {
@@ -194,7 +216,6 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
-                //.background(Color.White)
                 .clip(
                     RoundedCornerShape(
                         topEnd = 8.dp,
@@ -245,7 +266,7 @@ class MainActivity : ComponentActivity() {
         val modalBottomSheetState = rememberModalBottomSheetState()
 
         ModalBottomSheet(
-            onDismissRequest = { /*onDismiss()*/ },
+            onDismissRequest = {},
             sheetState = modalBottomSheetState,
             dragHandle = { BottomSheetDefaults.DragHandle() },
         ) {
